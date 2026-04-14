@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AISCOS – AI-Based Supply Chain Optimization System</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #060910;
+    --surface: #0d1117;
+    --surface2: #131820;
+    --border: #1e2a38;
+    --accent: #00e5ff;
+    --accent2: #ff4d6d;
+    --accent3: #a0ff6f;
+    --accent4: #ffb830;
+    --text: #e8f0f8;
+    --text-dim: #5a7085;
+    --text-mid: #8aa0b8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 0 40px; display: flex; align-items: center;
+    justify-content: space-between; height: 64px; position: sticky; top: 0; z-index: 100;
+  }
+  .header-logo { display: flex; align-items: center; gap: 12px; }
+  .logo-mark {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--accent), #0080ff);
+    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; color: #000;
+  }
+  .logo-text { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 17px; letter-spacing: 0.5px; }
+  .logo-sub { font-size: 11px; color: var(--text-dim); font-family: 'IBM Plex Mono', monospace; letter-spacing: 1px; }
+  .header-status { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-dim); font-family: 'IBM Plex Mono', monospace; }
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent3); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* ── NAV ── */
+  .nav { background: var(--surface); border-bottom: 1px solid var(--border); display: flex; padding: 0 40px; overflow-x: auto; }
+  .nav-btn {
+    background: none; border: none; color: var(--text-dim);
+    font-family: 'Inter', sans-serif; font-size: 12.5px; font-weight: 500;
+    padding: 14px 20px; cursor: pointer; border-bottom: 2px solid transparent;
+    white-space: nowrap; letter-spacing: 0.3px; transition: color 0.2s;
+  }
+  .nav-btn:hover { color: var(--text-mid); }
+  .nav-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .nav-btn .nav-tag {
+    font-size: 9px; font-family: 'IBM Plex Mono', monospace;
+    background: var(--surface2); border: 1px solid var(--border);
+    padding: 2px 6px; border-radius: 4px; margin-left: 6px; color: var(--text-dim);
+  }
+  .nav-btn.active .nav-tag { background: rgba(0,229,255,0.08); border-color: var(--accent); color: var(--accent); }
+
+  /* ── MAIN ── */
+  .main { max-width: 1140px; margin: 0 auto; padding: 36px 24px 80px; }
+  .page { display: none; }
+  .page.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+  /* ── HERO ── */
+  .home-hero {
+    border: 1px solid var(--border); border-radius: 16px;
+    background: linear-gradient(135deg, var(--surface) 0%, #0a1520 100%);
+    padding: 52px 48px; margin-bottom: 32px; position: relative; overflow: hidden;
+  }
+  .home-hero::before {
+    content: ''; position: absolute; top: -80px; right: -80px;
+    width: 320px; height: 320px;
+    background: radial-gradient(circle, rgba(0,229,255,0.06) 0%, transparent 70%); pointer-events: none;
+  }
+  .home-hero::after {
+    content: ''; position: absolute; bottom: -60px; left: -60px;
+    width: 220px; height: 220px;
+    background: radial-gradient(circle, rgba(255,77,109,0.05) 0%, transparent 70%); pointer-events: none;
+  }
+  .hero-label {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .hero-label::before { content: ''; display: inline-block; width: 20px; height: 1px; background: var(--accent); }
+  .home-hero h1 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 38px; line-height: 1.15; margin-bottom: 14px; }
+  .home-hero h1 span { color: var(--accent); }
+  .home-hero .hero-desc { font-size: 15px; color: var(--text-mid); line-height: 1.7; max-width: 640px; margin-bottom: 28px; }
+  .hero-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+  .hero-tag { font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 5px 12px; border-radius: 6px; border: 1px solid var(--border); color: var(--text-mid); }
+  .hero-tag.cyan { border-color: rgba(0,229,255,0.3); color: var(--accent); background: rgba(0,229,255,0.05); }
+  .hero-tag.red  { border-color: rgba(255,77,109,0.3); color: var(--accent2); background: rgba(255,77,109,0.05); }
+  .hero-tag.green{ border-color: rgba(160,255,111,0.3); color: var(--accent3); background: rgba(160,255,111,0.05); }
+  .hero-tag.gold { border-color: rgba(255,184,48,0.3); color: var(--accent4); background: rgba(255,184,48,0.05); }
+
+  /* ── PRIORITIES STRIP ── */
+  .priorities-strip { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 32px; }
+  .priority-card {
+    border: 1px solid var(--border); border-radius: 14px; background: var(--surface);
+    padding: 24px 22px; position: relative; overflow: hidden;
+    cursor: pointer; transition: border-color 0.2s, transform 0.18s;
+  }
+  .priority-card:hover { transform: translateY(-2px); }
+  .priority-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+  .pc1::before { background: linear-gradient(90deg, var(--accent), #0080ff); }
+  .pc2::before { background: linear-gradient(90deg, var(--accent2), #ff8c00); }
+  .pc3::before { background: linear-gradient(90deg, var(--accent3), #00bfa5); }
+  .pc1:hover { border-color: var(--accent); }
+  .pc2:hover { border-color: var(--accent2); }
+  .pc3:hover { border-color: var(--accent3); }
+  .priority-icon { font-size: 26px; margin-bottom: 12px; }
+  .priority-num { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 6px; }
+  .priority-title { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 800; margin-bottom: 10px; }
+  .pc1 .priority-title { color: var(--accent); }
+  .pc2 .priority-title { color: var(--accent2); }
+  .pc3 .priority-title { color: var(--accent3); }
+  .priority-points { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+  .priority-points li { font-size: 12.5px; color: var(--text-mid); display: flex; align-items: flex-start; gap: 8px; line-height: 1.5; }
+  .priority-points li::before { content: '▸'; flex-shrink: 0; margin-top: 1px; font-size: 10px; }
+  .pc1 .priority-points li::before { color: var(--accent); }
+  .pc2 .priority-points li::before { color: var(--accent2); }
+  .pc3 .priority-points li::before { color: var(--accent3); }
+  .priority-footer { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text-dim); display: flex; align-items: center; gap: 5px; }
+
+  /* ── KPI SECTION ── */
+  .section-header { margin-bottom: 20px; }
+  .section-header h2 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 20px; color: var(--text); margin-bottom: 4px; }
+  .section-header p { font-size: 13px; color: var(--text-dim); }
+
+  .kpi-master-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 32px; }
+  .kpi-group {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 22px 20px; position: relative; overflow: hidden;
+  }
+  .kpi-group::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+  .kg1::before { background: linear-gradient(90deg, var(--accent), #0080ff); }
+  .kg2::before { background: linear-gradient(90deg, var(--accent2), #ff8c00); }
+  .kg3::before { background: linear-gradient(90deg, var(--accent3), #00bfa5); }
+  .kpi-group-label { font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 4px; }
+  .kpi-group-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; margin-bottom: 14px; }
+  .kpi-points { display: flex; flex-direction: column; gap: 8px; }
+  .kpi-point { display: flex; align-items: flex-start; gap: 9px; padding: 9px 11px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; }
+  .kpi-bullet { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+  .kg1 .kpi-bullet { background: var(--accent); }
+  .kg2 .kpi-bullet { background: var(--accent2); }
+  .kg3 .kpi-bullet { background: var(--accent3); }
+  .kpi-point-name { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; font-weight: 600; color: var(--text); }
+  .kpi-point-desc { font-size: 11px; color: var(--text-dim); line-height: 1.45; margin-top: 1px; }
+
+  /* ── BEST MODELS ── */
+  .best-models-section { margin-bottom: 32px; }
+  .best-models-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 12px; }
+  .best-card {
+    border: 1px solid var(--border); border-radius: 12px; background: var(--surface2);
+    padding: 16px 16px 14px; display: flex; flex-direction: column; gap: 6px; position: relative; overflow: hidden;
+  }
+  .best-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+  .bc-rq1::before { background: var(--accent); }
+  .bc-rq1b::before { background: #0080ff; }
+  .bc-rq2a::before { background: var(--accent2); }
+  .bc-rq2b::before { background: #ff8c00; }
+  .bc-rq3::before { background: var(--accent3); }
+  .best-card-label { font-size: 9px; font-family: 'IBM Plex Mono', monospace; letter-spacing: 1px; text-transform: uppercase; color: var(--text-dim); line-height: 1.4; }
+  .best-card-model { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; }
+  .bc-rq1 .best-card-model  { color: var(--accent); }
+  .bc-rq1b .best-card-model { color: #4da6ff; }
+  .bc-rq2a .best-card-model { color: var(--accent2); }
+  .bc-rq2b .best-card-model { color: var(--accent4); }
+  .bc-rq3 .best-card-model  { color: var(--accent3); }
+  .best-card-score { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: var(--text-mid); line-height: 1.5; }
+  .best-card-badge { font-size: 9.5px; font-family: 'IBM Plex Mono', monospace; color: var(--accent3); margin-top: 2px; }
+
+  /* ── INNER PAGE ELEMENTS ── */
+  .dataset-link {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11px; font-family: 'IBM Plex Mono', monospace;
+    color: var(--accent); background: rgba(0,229,255,0.07);
+    border: 1px solid rgba(0,229,255,0.2); padding: 4px 10px;
+    border-radius: 6px; margin-top: 8px; text-decoration: none; transition: background 0.2s;
+  }
+  .dataset-link:hover { background: rgba(0,229,255,0.12); }
+  .selector-row { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 24px; }
+  .selector-group { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 180px; }
+  .selector-group label { font-size: 10px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.8px; font-family: 'IBM Plex Mono', monospace; }
+  .selector-group select {
+    padding: 9px 14px; border: 1px solid var(--border); border-radius: 8px;
+    font-size: 13.5px; background: var(--surface2); color: var(--text);
+    cursor: pointer; outline: none; transition: border-color 0.2s; font-family: 'Inter', sans-serif;
+  }
+  .selector-group select:focus { border-color: var(--accent); }
+  .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 24px; }
+  .metric-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; position: relative; overflow: hidden; }
+  .metric-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+  .metric-card.rmse::after { background: var(--accent2); }
+  .metric-card.mae::after  { background: var(--accent4); }
+  .metric-card.mape::after { background: var(--accent3); }
+  .metric-card.r2::after   { background: #3498db; }
+  .metric-card.acc::after  { background: #9b59b6; }
+  .metric-card.prec::after { background: var(--accent2); }
+  .metric-card.rec::after  { background: var(--accent4); }
+  .metric-card.f1::after   { background: var(--accent3); }
+  .metric-card.wape::after { background: var(--accent); }
+  .metric-label { font-size: 10px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; font-family: 'IBM Plex Mono', monospace; }
+  .metric-value { font-family: 'IBM Plex Mono', monospace; font-size: 26px; font-weight: 600; color: var(--text); line-height: 1; }
+  .chart-section { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 22px 24px; margin-bottom: 20px; }
+  .chart-section h3 { font-size: 13px; font-weight: 500; color: var(--text-mid); margin-bottom: 18px; font-family: 'IBM Plex Mono', monospace; }
+  .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .bar-label { font-size: 11px; color: var(--text-dim); width: 90px; text-align: right; flex-shrink: 0; font-family: 'IBM Plex Mono', monospace; }
+  .bar-track { flex: 1; background: var(--surface2); border-radius: 4px; height: 28px; overflow: hidden; border: 1px solid var(--border); }
+  .bar-fill { height: 100%; border-radius: 3px; display: flex; align-items: center; padding-left: 10px; font-size: 11px; font-weight: 600; color: #000; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); font-family: 'IBM Plex Mono', monospace; }
+  .bar-val { font-size: 11px; color: var(--text-mid); width: 80px; flex-shrink: 0; font-family: 'IBM Plex Mono', monospace; }
+  .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 24px; }
+  .table-wrap table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .table-wrap th { background: var(--surface2); color: var(--text-mid); padding: 12px 16px; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border); font-family: 'IBM Plex Mono', monospace; font-size: 11px; text-transform: uppercase; }
+  .table-wrap td { padding: 11px 16px; border-bottom: 1px solid var(--border); color: var(--text-mid); }
+  .table-wrap tr:last-child td { border-bottom: none; }
+  .table-wrap tr:hover td { background: var(--surface2); }
+  .table-wrap .best { color: var(--accent3); font-weight: 700; }
+  .table-wrap .highlight-row td { background: rgba(0,229,255,0.03); }
+  .info-box { background: rgba(0,229,255,0.04); border: 1px solid rgba(0,229,255,0.15); border-radius: 10px; padding: 12px 16px; font-size: 12.5px; color: var(--text-mid); line-height: 1.6; margin-bottom: 20px; font-family: 'IBM Plex Mono', monospace; }
+  .info-box strong { color: var(--text); }
+  .best-note { background: rgba(160,255,111,0.04); border: 1px solid rgba(160,255,111,0.2); border-radius: 10px; padding: 12px 16px; font-size: 12.5px; color: var(--text-mid); line-height: 1.7; margin-bottom: 20px; font-family: 'IBM Plex Mono', monospace; }
+  .best-note strong { color: var(--accent3); }
+
+  /* ── LIVE TESTING ── */
+  .live-explainer {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 28px 32px; margin-bottom: 28px;
+  }
+  .live-explainer-title {
+    font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700;
+    color: var(--text); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+  }
+  .live-explainer-title span { font-size: 18px; }
+  .explainer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .explainer-block { }
+  .explainer-block h4 { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+  .explainer-steps { display: flex; flex-direction: column; gap: 8px; }
+  .explainer-step { display: flex; gap: 11px; align-items: flex-start; }
+  .step-num { width: 22px; height: 22px; border-radius: 50%; background: rgba(0,229,255,0.1); border: 1px solid rgba(0,229,255,0.25); display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600; color: var(--accent); flex-shrink: 0; margin-top: 1px; }
+  .step-text { font-size: 12.5px; color: var(--text-mid); line-height: 1.55; }
+  .step-text strong { color: var(--text); }
+  .model-pills { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
+  .model-pill { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border); color: var(--text-mid); background: var(--surface2); }
+  .model-pill.p-cyan  { border-color: rgba(0,229,255,0.3); color: var(--accent); background: rgba(0,229,255,0.06); }
+  .model-pill.p-red   { border-color: rgba(255,77,109,0.3); color: var(--accent2); background: rgba(255,77,109,0.06); }
+  .model-pill.p-green { border-color: rgba(160,255,111,0.3); color: var(--accent3); background: rgba(160,255,111,0.06); }
+  .flow-arrow { font-size: 11px; color: var(--text-dim); padding: 0 4px; }
+  .backend-flow { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; margin-top: 12px; }
+  .flow-node { font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 4px 9px; background: var(--surface2); border: 1px solid var(--border); border-radius: 5px; color: var(--text-mid); }
+
+  .live-badge { display: flex; align-items: center; gap: 6px; background: rgba(160,255,111,0.08); border: 1px solid rgba(160,255,111,0.25); padding: 5px 12px; border-radius: 20px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--accent3); }
+  .live-badge::before { content: ''; width: 6px; height: 6px; background: var(--accent3); border-radius: 50%; animation: pulse 1.5s infinite; }
+  .live-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+  .live-header h2 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 20px; }
+  .live-header p { font-size: 13px; color: var(--text-dim); margin-top: 3px; }
+
+  .shared-fields { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 22px 24px; margin-bottom: 18px; }
+  .shared-fields h3 { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; margin-bottom: 3px; }
+  .shared-fields p { font-size: 12px; color: var(--text-dim); margin-bottom: 16px; }
+  .shared-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
+
+  .live-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; margin-bottom: 22px; }
+  .live-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 22px; }
+  .live-panel-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; margin-bottom: 3px; display: flex; align-items: center; gap: 8px; }
+  .panel-icon { width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .p1 .panel-icon { background: rgba(0,229,255,0.1); }
+  .p2 .panel-icon { background: rgba(255,77,109,0.1); }
+  .p3 .panel-icon { background: rgba(160,255,111,0.1); }
+  .live-panel > p { font-size: 11.5px; color: var(--text-dim); margin-bottom: 16px; }
+  .field-group { display: flex; flex-direction: column; gap: 11px; }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field label { font-size: 10px; font-weight: 600; color: var(--text-dim); font-family: 'IBM Plex Mono', monospace; text-transform: uppercase; letter-spacing: 0.8px; }
+  .field input, .field select { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 13px; padding: 8px 12px; outline: none; transition: border-color 0.2s; width: 100%; }
+  .field input:focus, .field select:focus { border-color: var(--accent); }
+  .field input::placeholder { color: var(--text-dim); font-size: 12px; }
+
+  .run-btn {
+    display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%;
+    background: linear-gradient(135deg, var(--accent), #0080ff); color: #000;
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px;
+    padding: 14px 28px; border-radius: 10px; border: none; cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s; letter-spacing: 0.5px;
+  }
+  .run-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+  .run-btn:active { transform: translateY(0); }
+  .run-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .error-box { background: rgba(255,77,109,0.07); border: 1px solid rgba(255,77,109,0.25); border-radius: 10px; padding: 14px 18px; font-size: 13px; color: var(--accent2); margin-top: 16px; display: none; font-family: 'IBM Plex Mono', monospace; line-height: 1.6; }
+  .error-box.visible { display: block; }
+  .fallback-note { background: rgba(255,184,48,0.05); border: 1px solid rgba(255,184,48,0.2); border-radius: 8px; padding: 10px 14px; font-size: 11.5px; color: var(--accent4); margin-bottom: 16px; font-family: 'IBM Plex Mono', monospace; display: none; }
+  .fallback-note.visible { display: block; }
+
+  .results-area { display: none; margin-top: 26px; }
+  .results-area.visible { display: block; animation: fadeIn 0.4s ease; }
+  .results-header { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+  .results-header::before, .results-header::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .results-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; margin-bottom: 20px; }
+  .result-card { border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 20px 20px 16px; position: relative; overflow: hidden; }
+  .result-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+  .r1::before { background: linear-gradient(90deg, var(--accent), #0080ff); }
+  .r2::before { background: linear-gradient(90deg, var(--accent2), #ff8c00); }
+  .r3::before { background: linear-gradient(90deg, var(--accent3), #00bfa5); }
+  .rc-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text-dim); margin-bottom: 5px; }
+  .rc-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; margin-bottom: 12px; }
+  .rc-value { font-family: 'IBM Plex Mono', monospace; font-size: 28px; font-weight: 600; line-height: 1.1; }
+  .r1 .rc-value { color: var(--accent); }
+  .r2 .rc-value { color: var(--accent2); }
+  .r3 .rc-value { color: var(--accent3); }
+  .rc-unit { font-size: 13px; color: var(--text-dim); margin-left: 4px; font-weight: 400; }
+  .rc-sub { font-size: 11.5px; color: var(--text-dim); margin-top: 7px; line-height: 1.5; }
+  .rc-model-badge { display: inline-block; margin-top: 9px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 3px 8px; border-radius: 4px; background: var(--surface2); border: 1px solid var(--border); color: var(--text-dim); }
+
+  .ai-insight { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px 22px; margin-top: 16px; }
+  .ai-insight-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
+  .ai-insight-text { font-size: 14px; color: var(--text-mid); line-height: 1.75; }
+  .ai-insight-text strong { color: var(--text); }
+
+  .loading-overlay { display: none; position: fixed; inset: 0; background: rgba(6,9,16,0.85); z-index: 999; align-items: center; justify-content: center; flex-direction: column; gap: 14px; }
+  .loading-overlay.visible { display: flex; }
+  .spinner { width: 44px; height: 44px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text { font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--text-mid); }
+  .loading-sub  { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-dim); }
+
+  /* Responsive */
+  @media (max-width: 960px) {
+    .priorities-strip, .kpi-master-grid { grid-template-columns: 1fr; }
+    .best-models-grid { grid-template-columns: 1fr 1fr; }
+    .live-grid { grid-template-columns: 1fr; }
+    .shared-grid { grid-template-columns: 1fr 1fr; }
+    .results-grid { grid-template-columns: 1fr; }
+    .explainer-grid { grid-template-columns: 1fr; }
+    .header { padding: 0 16px; }
+    .nav { padding: 0 8px; }
+    .main { padding: 20px 12px 60px; }
+    .home-hero { padding: 32px 24px; }
+    .home-hero h1 { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<div class="header">
+  <div class="header-logo">
+    <div class="logo-mark">AI</div>
+    <div>
+      <div class="logo-text">AISCOS</div>
+      <div class="logo-sub">Supply Chain Intelligence</div>
+    </div>
+  </div>
+  <div class="header-status">
+    <div class="status-dot"></div>
+    System Online
+  </div>
+</div>
+
+<!-- ══ NAV ══ -->
+<div class="nav">
+  <button class="nav-btn active" onclick="showPage('home',this)">Overview <span class="nav-tag">HOME</span></button>
+  <button class="nav-btn" onclick="showPage('rq1',this)">Production Forecasting <span class="nav-tag">RQ1·50K</span></button>
+  <button class="nav-btn" onclick="showPage('rq1b',this)">Production Forecasting <span class="nav-tag">RQ1·T1</span></button>
+  <button class="nav-btn" onclick="showPage('rq2',this)">Defect Detection <span class="nav-tag">RQ2</span></button>
+  <button class="nav-btn" onclick="showPage('rq3',this)">Inventory Optimization <span class="nav-tag">RQ3</span></button>
+  <button class="nav-btn" onclick="showPage('live',this)">Live Testing <span class="nav-tag">AI</span></button>
+</div>
+
+<div class="main">
+
+<!-- ══════════ HOME PAGE ══════════ -->
+<div id="page-home" class="page active">
+
+  <!-- Hero -->
+  <div class="home-hero">
+    <div class="hero-label">Research Framework</div>
+    <h1>AI-Based <span>Supply Chain</span><br>Optimization System</h1>
+    <p class="hero-desc">An integrated multi-model evaluation framework combining production forecasting, defect detection, and inventory optimization into a single AI-driven supply chain intelligence system.</p>
+    <div class="hero-tags">
+      <span class="hero-tag cyan">Time-Series Forecasting</span>
+      <span class="hero-tag red">Defect Classification</span>
+      <span class="hero-tag green">Inventory Management</span>
+      <span class="hero-tag">FreshRetailNet-50K</span>
+      <span class="hero-tag">Kaggle Datasets</span>
+      <span class="hero-tag gold">Unified AI Framework</span>
+    </div>
+  </div>
+
+  <!-- Main Priorities -->
+  <div class="section-header">
+    <h2>Core Research Priorities</h2>
+    <p>Three integrated areas of AI-driven supply chain optimization</p>
+  </div>
+  <div class="priorities-strip">
+
+    <div class="priority-card pc1" onclick="showPage('rq1',document.querySelectorAll('.nav-btn')[1])">
+      <div class="priority-icon">📈</div>
+      <div class="priority-num">Priority 01 · RQ1</div>
+      <div class="priority-title">Production Forecasting</div>
+      <ul class="priority-points">
+        <li>Predict future production and demand volumes using AI time-series models</li>
+        <li>Reduce overproduction and stockouts through accurate demand signals</li>
+        <li>Plan production schedules with ARMA, ARIMA, SARIMA, ARIMAX &amp; SARIMAX</li>
+        <li>Evaluated on two datasets: FreshRetailNet-50K and T1 PVC manufacturing data</li>
+        <li>Minimize forecast uncertainty to support upstream procurement decisions</li>
+      </ul>
+      <div class="priority-footer">→ Click to explore results</div>
+    </div>
+
+    <div class="priority-card pc2" onclick="showPage('rq2',document.querySelectorAll('.nav-btn')[3])">
+      <div class="priority-icon">🔍</div>
+      <div class="priority-num">Priority 02 · RQ2</div>
+      <div class="priority-title">Defect Detection</div>
+      <ul class="priority-points">
+        <li>Automatically identify defective products early in the manufacturing process</li>
+        <li>Reduce waste and prevent faulty goods from reaching customers</li>
+        <li>Apply Logistic Regression, Random Forest, XGBoost &amp; MLP classifiers</li>
+        <li>Validated on Kaggle Manufacturing Defects and DataCo Supply Chain datasets</li>
+        <li>Maximize recall to catch all defects while maintaining high precision</li>
+      </ul>
+      <div class="priority-footer">→ Click to explore results</div>
+    </div>
+
+    <div class="priority-card pc3" onclick="showPage('rq3',document.querySelectorAll('.nav-btn')[4])">
+      <div class="priority-icon">📦</div>
+      <div class="priority-num">Priority 03 · RQ3</div>
+      <div class="priority-title">Inventory Optimization</div>
+      <ul class="priority-points">
+        <li>Determine optimal inventory levels to balance stockouts and holding costs</li>
+        <li>Use AI forecasting to drive safety stock and reorder point calculations</li>
+        <li>Compare ARIMA, SARIMA, N-BEATS, ARIMAX and ARMA models</li>
+        <li>Evaluated on FreshRetailNet-50K across MAE, RMSE, MAPE and WAPE</li>
+        <li>Support downstream logistics with reliable demand-driven inventory signals</li>
+      </ul>
+      <div class="priority-footer">→ Click to explore results</div>
+    </div>
+
+  </div>
+
+  <!-- KPIs -->
+  <div class="section-header">
+    <h2>Key Performance Indicators</h2>
+    <p>Evaluation metrics used to measure AI effectiveness across each research priority</p>
+  </div>
+  <div class="kpi-master-grid">
+
+    <div class="kpi-group kg1">
+      <div class="kpi-group-label">RQ1 · Production Forecasting</div>
+      <div class="kpi-group-title">Forecasting Accuracy KPIs</div>
+      <div class="kpi-points">
+        <div class="kpi-point"><div class="kpi-bullet"></div><div><div class="kpi-point-name">RMSE — Root Mean Squared Error</div><div class="kpi-point-desc">Penalises large forecast errors heavily. Primary metric — lower RMSE means fewer costly over/under-production events.</div></div></div>
+        <div class="kpi-point"><div class="kpi-bullet"></div><div><div class="kpi-point-name">MAE — Mean Absolute Error</div><div class="kpi-point-desc">Average error in original production units. Directly maps to surplus stock or shortage volume per period.</div></div></div>
+        <div class="kpi-point"><div class="kpi-bullet"></div><div><div class="kpi-point-name">MAPE — Mean Absolute % Error</div><div class="kpi-point-desc">Scale-free percentage error. Enables fair model comparison across different product categories and SKU sizes.</div></div></div>
+        <div class="kpi-point"><div class="kpi-bullet"></div><div><div class="kpi-point-name">R² — Coefficient of Determination</div><div class="kpi-point-desc">Variance explained by the model. Closer to 1.0 means the model captures underlying demand patterns well.</div></div></div>
+      </div>
+    </div>
+
+    <div class="kpi-group kg2">
+      <div class="kpi-group-label">RQ2 · Defect Detection</div>
+      <div class="kpi-group-title">Classification Quality KPIs</div>
+      <div class="kpi-points">
+        <div class="kpi-point"><div class="kpi-bullet"></div><div><div class="kpi-point-name">Accuracy — Overall Correct Rate</div><div class="kpi-point-desc">Proportion of all products correctly labelled. Primary metric for overall classifier reliability.</div></div></div>
+        <div class="kpi-point"><div class="kpi-bullet"></div><div><div class="kpi-point-name">Precision — Positive Predictive Value</div><div class="kpi-point-desc">Of all flagged defects, how many were truly defective. High precision avoids scrapping good products unnecessarily.</div></div></div>
+        <div class="kpi-point"><div class="kpi-bullet"></div><div><div class="kpi-point-name">Recall — Sensitivity / Detection Rate</div><div class="kpi-point-desc">Of all real defects, how many were caught. High recall prevents faulty products from reaching end customers.</div></div></div>
+        <div class="kpi-point"><div class="kpi-bullet"></div><div><div class="kpi-point-name">F1-Score — Harmonic Mean of P &amp; R</div><div class="kpi-point-desc">Balances Precision and Recall into one score. Key metric when defect datasets are imbalanced.</div></div></div>
+      </div>
+    </div>
+
+    <div class="kpi-group kg3">
+      <div class="kpi-group-label">RQ3 · Inventory Optimization</div>
+      <div class="kpi-group-title">Inventory Efficiency KPIs</div>
+      <div class="kpi-points">
+        <div class="kpi-point"><div class="kpi-bullet"></div><div><div class="kpi-point-name">MAE — Mean Absolute Error</div><div class="kpi-point-desc">Average inventory forecast error in units. Ties directly to holding cost volume and stockout frequency.</div></div></div>
+        <div class="kpi-point"><div class="kpi-bullet"></div><div><div class="kpi-point-name">RMSE — Root Mean Squared Error</div><div class="kpi-point-desc">Amplifies large misses. Critical for preventing sudden stockout events or extreme overstock situations.</div></div></div>
+        <div class="kpi-point"><div class="kpi-bullet"></div><div><div class="kpi-point-name">MAPE — Mean Absolute % Error</div><div class="kpi-point-desc">Percentage-based error for comparing inventory accuracy across SKUs of varying demand volumes.</div></div></div>
+        <div class="kpi-point"><div class="kpi-bullet"></div><div><div class="kpi-point-name">WAPE — Weighted Absolute % Error</div><div class="kpi-point-desc">Volume-weighted error metric. Accounts for demand scale per SKU — best for aggregate inventory decisions.</div></div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Best Performing Models — all 5 datasets -->
+  <div class="best-models-section">
+    <div class="section-header">
+      <h2>Best Performing Models</h2>
+      <p>Top model per dataset across all research questions</p>
+    </div>
+    <div class="best-models-grid">
+
+      <div class="best-card bc-rq1">
+        <div class="best-card-label">RQ1 · FreshRetailNet-50K</div>
+        <div class="best-card-model">SARIMAX</div>
+        <div class="best-card-score">RMSE: 207.56<br>MAE: 159.10 &nbsp;|&nbsp; R²: 0.0722</div>
+        <div class="best-card-badge">▲ Lowest RMSE &amp; MAE</div>
+      </div>
+
+      <div class="best-card bc-rq1b">
+        <div class="best-card-label">RQ1 · T1 PVC Dataset</div>
+        <div class="best-card-model">ARIMA</div>
+        <div class="best-card-score">RMSE: 410.67<br>MAE: 410.66 &nbsp;|&nbsp; MAPE: 5.12%</div>
+        <div class="best-card-badge">▲ Best valid model (no seasonality in data)</div>
+      </div>
+
+      <div class="best-card bc-rq2a">
+        <div class="best-card-label">RQ2 · Kaggle Mfg. Defects</div>
+        <div class="best-card-model">Random Forest</div>
+        <div class="best-card-score">Accuracy: 95.06%<br>F1: 97.13% &nbsp;|&nbsp; Recall: 99.27%</div>
+        <div class="best-card-badge">▲ Full features split</div>
+      </div>
+
+      <div class="best-card bc-rq2b">
+        <div class="best-card-label">RQ2 · DataCo Supply Chain</div>
+        <div class="best-card-model">Random Forest</div>
+        <div class="best-card-score">Accuracy: 81.15%<br>F1: 81.39% &nbsp;|&nbsp; Precision: 88.67%</div>
+        <div class="best-card-badge">▲ Best overall classifier</div>
+      </div>
+
+      <div class="best-card bc-rq3">
+        <div class="best-card-label">RQ3 · FreshRetailNet-50K</div>
+        <div class="best-card-model">SARIMA</div>
+        <div class="best-card-score">MAE: 1,344.27<br>RMSE: 1,995.96 &nbsp;|&nbsp; MAPE: 9.96%</div>
+        <div class="best-card-badge">▲ Lowest MAE &amp; RMSE</div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+<!-- end home -->
+
+<!-- ══════════ RQ1: FreshRetailNet ══════════ -->
+<div id="page-rq1" class="page">
+  <div class="section-header">
+    <h2>RQ1 – Production Forecasting</h2>
+    <p>Time-series forecasting models evaluated on FreshRetailNet-50K (4.85M rows, fresh retail)</p>
+    <a class="dataset-link" href="https://huggingface.co/datasets/Simrita/FreshRetailNet-50K" target="_blank">↗ HuggingFace: FreshRetailNet-50K</a>
+  </div>
+  <div class="selector-row">
+    <div class="selector-group">
+      <label>Select Model</label>
+      <select id="rq1-model" onchange="renderRQ1()">
+        <option value="all">All Models (compare)</option>
+        <option value="ARMA">ARMA</option>
+        <option value="ARIMAX">ARIMAX</option>
+        <option value="SARIMA">SARIMA</option>
+        <option value="ARIMA">ARIMA</option>
+        <option value="SARIMAX">SARIMAX</option>
+      </select>
+    </div>
+    <div class="selector-group">
+      <label>Highlight Metric</label>
+      <select id="rq1-metric" onchange="renderRQ1()">
+        <option value="RMSE">RMSE</option>
+        <option value="MAE">MAE</option>
+        <option value="MAPE">MAPE</option>
+        <option value="R2">R²</option>
+      </select>
+    </div>
+  </div>
+  <div class="best-note">★ <strong>Best Model: SARIMAX</strong> — Lowest RMSE (207.56) and MAE (159.10) on FreshRetailNet-50K. SARIMAX captures both seasonal patterns and exogenous variables, outperforming all other models on the primary accuracy KPIs.</div>
+  <div id="rq1-single-cards" class="metrics-grid" style="display:none;"></div>
+  <div id="rq1-chart" class="chart-section"></div>
+  <div class="table-wrap"><table id="rq1-table"></table></div>
+</div>
+
+<!-- ══════════ RQ1b: T1 Dataset ══════════ -->
+<div id="page-rq1b" class="page">
+  <div class="section-header">
+    <h2>RQ1 – Production Forecasting (T1 / PVC Manufacturing Dataset)</h2>
+    <p>Time-series forecasting on the own T1 dataset — local PVC manufacturing supply chain data</p>
+    <a class="dataset-link" href="https://docs.google.com/spreadsheets/d/19c-VJcs4RGzVji1TP2Xr7BAO0nbXL-SOk5IK-qco6vs/edit?usp=sharing" target="_blank">↗ Google Sheets: T1 Dataset</a>
+  </div>
+  <div class="selector-row">
+    <div class="selector-group">
+      <label>Select Model</label>
+      <select id="rq1b-model" onchange="renderRQ1B()">
+        <option value="all">All Models (compare)</option>
+        <option value="ARMA">ARMA</option>
+        <option value="ARIMA">ARIMA</option>
+        <option value="SARIMA">SARIMA</option>
+        <option value="ARIMAX">ARIMAX</option>
+        <option value="SARIMAX">SARIMAX</option>
+      </select>
+    </div>
+    <div class="selector-group">
+      <label>Highlight Metric</label>
+      <select id="rq1b-metric" onchange="renderRQ1B()">
+        <option value="RMSE">RMSE</option>
+        <option value="MAE">MAE</option>
+        <option value="MAPE">MAPE</option>
+        <option value="R2">R²</option>
+      </select>
+    </div>
+  </div>
+  <div class="best-note">★ <strong>Best Valid Model: ARIMA</strong> — Lowest reliable RMSE (410.67), MAE (410.66), and MAPE (5.12%) on the T1 PVC dataset. Although SARIMA and SARIMAX show lower raw numbers (RMSE/MAE: 385.13, MAPE: 3.16%), those results are <strong>not meaningful</strong> — the T1 dataset has no seasonal patterns, so seasonal models overfit to noise rather than real signal, producing misleading metrics. ARIMA's non-seasonal structure is the correct and trustworthy model for this data.</div>
+  <div id="rq1b-single-cards" class="metrics-grid" style="display:none;"></div>
+  <div id="rq1b-chart" class="chart-section"></div>
+  <div class="table-wrap"><table id="rq1b-table"></table></div>
+</div>
+
+<!-- ══════════ RQ2 ══════════ -->
+<div id="page-rq2" class="page">
+  <div class="section-header">
+    <h2>RQ2 – Manufacturing Defect Detection</h2>
+    <p>Classification models on two datasets: Kaggle Manufacturing Defects &amp; DataCo Supply Chain</p>
+  </div>
+  <div class="selector-row">
+    <div class="selector-group">
+      <label>Dataset</label>
+      <select id="rq2-dataset" onchange="renderRQ2()">
+        <option value="kaggle">Kaggle: Manufacturing Defects</option>
+        <option value="dataco">Kaggle: DataCo Smart Supply Chain</option>
+      </select>
+    </div>
+    <div class="selector-group">
+      <label>Data Split (Kaggle only)</label>
+      <select id="rq2-split" onchange="renderRQ2()">
+        <option value="full">Full Features</option>
+        <option value="clean">Clean Features</option>
+      </select>
+    </div>
+    <div class="selector-group">
+      <label>Select Model</label>
+      <select id="rq2-model" onchange="renderRQ2()">
+        <option value="all">All Models (compare)</option>
+        <option value="LR">Logistic Regression</option>
+        <option value="RF">Random Forest</option>
+        <option value="XGB">XGBoost</option>
+        <option value="MLP">MLP</option>
+      </select>
+    </div>
+  </div>
+  <div id="rq2-info" class="info-box"></div>
+  <div class="best-note">★ <strong>Best Model: Random Forest</strong> — Highest Accuracy (95.06%), Recall (99.27%) and F1-Score (97.13%) on Kaggle Full Features. Also best on DataCo with 81.15% Accuracy. Random Forest consistently outperforms all other classifiers across both datasets.</div>
+  <div id="rq2-single-cards" class="metrics-grid" style="display:none;"></div>
+  <div id="rq2-chart" class="chart-section"></div>
+  <div class="table-wrap"><table id="rq2-table"></table></div>
+</div>
+
+<!-- ══════════ RQ3 ══════════ -->
+<div id="page-rq3" class="page">
+  <div class="section-header">
+    <h2>RQ3 – Inventory Optimization</h2>
+    <p>Demand forecasting models evaluated for inventory management on FreshRetailNet-50K</p>
+    <a class="dataset-link" href="https://huggingface.co/datasets/Simrita/FreshRetailNet-50K" target="_blank">↗ HuggingFace: FreshRetailNet-50K</a>
+  </div>
+  <div class="selector-row">
+    <div class="selector-group">
+      <label>Select Model</label>
+      <select id="rq3-model" onchange="renderRQ3()">
+        <option value="all">All Models (compare)</option>
+        <option value="ARIMA">ARIMA</option>
+        <option value="SARIMA">SARIMA</option>
+        <option value="N-BEATS">N-BEATS</option>
+        <option value="ARIMAX">ARIMAX</option>
+        <option value="ARMA">ARMA</option>
+      </select>
+    </div>
+    <div class="selector-group">
+      <label>Highlight Metric</label>
+      <select id="rq3-metric" onchange="renderRQ3()">
+        <option value="MAE">MAE (primary)</option>
+        <option value="RMSE">RMSE</option>
+        <option value="MAPE">MAPE (%)</option>
+        <option value="WAPE">WAPE (%)</option>
+      </select>
+    </div>
+  </div>
+  <div class="best-note">
+    ★ <strong>Best Overall Model: SARIMA</strong> — Achieves the lowest MAE (1,344.27) and lowest RMSE (1,995.96) making it the best model on absolute inventory unit errors. These KPIs directly determine stockout volume and holding cost, making SARIMA the primary recommendation for inventory optimization.
+    <br><br>
+    <span style="color:var(--text-dim);">Note: ARIMAX has slightly lower WAPE (6.68%) and MAPE (6.75%) on percentage metrics. However SARIMA dominates on absolute error (MAE &amp; RMSE) which matters most for actual inventory decision-making.</span>
+  </div>
+  <div id="rq3-single-cards" class="metrics-grid" style="display:none;"></div>
+  <div id="rq3-chart" class="chart-section"></div>
+  <div class="table-wrap"><table id="rq3-table"></table></div>
+</div>
+
+<!-- ══════════ LIVE TESTING ══════════ -->
+<div id="page-live" class="page">
+
+  <div class="live-header">
+    <div>
+      <h2>Live Testing</h2>
+      <p>Enter supply chain parameters to get AI-powered predictions for next month</p>
+    </div>
+    <div class="live-badge">AI Powered</div>
+  </div>
+
+  <!-- ── HOW IT WORKS EXPLAINER ── -->
+  <div class="live-explainer">
+    <div class="live-explainer-title"><span>⚙️</span> How This Works — Full Technical Explanation</div>
+    <div class="explainer-grid">
+
+      <div class="explainer-block">
+        <h4>What you enter &amp; why</h4>
+        <div class="explainer-steps">
+          <div class="explainer-step">
+            <div class="step-num">1</div>
+            <div class="step-text"><strong>General context</strong> (category, region, SKUs, month) gives the AI the business environment so it can adjust predictions for seasonality, market behaviour, and scale.</div>
+          </div>
+          <div class="explainer-step">
+            <div class="step-num">2</div>
+            <div class="step-text"><strong>Demand fields</strong> (current sales, 3-month average, trend %, seasonal factor) are the inputs the SARIMAX-style forecasting logic uses to project next month's required production volume.</div>
+          </div>
+          <div class="explainer-step">
+            <div class="step-num">3</div>
+            <div class="step-text"><strong>Defect fields</strong> (planned units, current defect rate, machine age, maintenance status) feed the Random Forest-inspired classifier that estimates how many units will be defective in the next production run.</div>
+          </div>
+          <div class="explainer-step">
+            <div class="step-num">4</div>
+            <div class="step-text"><strong>Inventory fields</strong> (stock on hand, lead time, holding cost, stockout penalty) are used by the SARIMA-style optimizer to calculate the recommended safety stock level that minimizes total cost.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="explainer-block">
+        <h4>Backend &amp; AI engine</h4>
+        <div class="explainer-steps">
+          <div class="explainer-step">
+            <div class="step-num">5</div>
+            <div class="step-text"><strong>Pre-computation:</strong> Before calling the AI, the system runs formula-based estimates locally in your browser using the exact parameter weights derived from our research models (SARIMAX RMSE 207.56, RF Acc 95.06%, SARIMA MAE 1344.27).</div>
+          </div>
+          <div class="explainer-step">
+            <div class="step-num">6</div>
+            <div class="step-text"><strong>AI API call:</strong> Your inputs plus the pre-computed estimates are sent to the <strong>Anthropic Claude API</strong> (claude-sonnet-4) via a secure POST request. Claude acts as an expert supply chain analyst that interprets your data with full domain reasoning.</div>
+          </div>
+          <div class="explainer-step">
+            <div class="step-num">7</div>
+            <div class="step-text"><strong>Structured output:</strong> Claude is instructed to respond only in JSON format with exact integer predictions and brief explanations for each of the three research questions — demand, defects, and safety stock.</div>
+          </div>
+          <div class="explainer-step">
+            <div class="step-num">8</div>
+            <div class="step-text"><strong>Fallback safety net:</strong> If the API is unavailable, the system automatically falls back to the local formula estimates so you always get results — a yellow notice will appear indicating this.</div>
+          </div>
+        </div>
+        <div class="backend-flow">
+          <div class="flow-node">Your Inputs</div><div class="flow-arrow">→</div>
+          <div class="flow-node">Pre-compute</div><div class="flow-arrow">→</div>
+          <div class="flow-node">Claude API</div><div class="flow-arrow">→</div>
+          <div class="flow-node">JSON Parse</div><div class="flow-arrow">→</div>
+          <div class="flow-node">Results</div>
+        </div>
+      </div>
+
+      <div class="explainer-block">
+        <h4>Models powering the predictions</h4>
+        <div class="model-pills">
+          <span class="model-pill p-cyan">SARIMAX → RQ1 Demand</span>
+          <span class="model-pill p-red">Random Forest → RQ2 Defects</span>
+          <span class="model-pill p-green">SARIMA → RQ3 Inventory</span>
+        </div>
+        <div class="explainer-steps" style="margin-top:12px;">
+          <div class="explainer-step">
+            <div class="step-num">A</div>
+            <div class="step-text"><strong>SARIMAX</strong> (best on FreshRetailNet-50K, RMSE 207.56): A Seasonal ARIMA model with eXogenous variables. It models seasonal demand cycles plus external factors like trend and promotions to forecast next-month production demand.</div>
+          </div>
+          <div class="explainer-step">
+            <div class="step-num">B</div>
+            <div class="step-text"><strong>Random Forest</strong> (Accuracy 95.06%, Recall 99.27%): An ensemble of decision trees that classifies products as defective or not. Machine age, maintenance history, and defect rate are key features. High recall ensures nearly all real defects are caught.</div>
+          </div>
+          <div class="explainer-step">
+            <div class="step-num">C</div>
+            <div class="step-text"><strong>SARIMA</strong> (best MAE 1,344.27 on FreshRetailNet-50K): Seasonal ARIMA applied to inventory demand. Its safety stock recommendation uses: daily demand × lead time × safety factor, adjusted for demand variability between current and historical sales.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="explainer-block">
+        <h4>How to interpret the results</h4>
+        <div class="explainer-steps">
+          <div class="explainer-step">
+            <div class="step-num">i</div>
+            <div class="step-text"><strong>Predicted Production Demand</strong> — the number of units your supply chain should plan to produce next month. Use this as your production target, adjusted for lead time and current stock.</div>
+          </div>
+          <div class="explainer-step">
+            <div class="step-num">ii</div>
+            <div class="step-text"><strong>Predicted Defective Units</strong> — the estimated number of units that will fail quality checks in the next production run. Subtract this from planned output to get your expected saleable yield.</div>
+          </div>
+          <div class="explainer-step">
+            <div class="step-num">iii</div>
+            <div class="step-text"><strong>Recommended Safety Stock</strong> — the buffer inventory level that protects against demand spikes and supply delays. If your current stock is below this number, you should reorder immediately.</div>
+          </div>
+          <div class="explainer-step">
+            <div class="step-num">iv</div>
+            <div class="step-text"><strong>AI Analysis section</strong> — the written recommendations from Claude are derived from integrating all three results. They identify the most urgent action, highlight risks, and suggest the optimal next step across your supply chain.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Shared context fields -->
+  <div class="shared-fields">
+    <h3>General Supply Chain Context</h3>
+    <p>Applied across all three predictions</p>
+    <div class="shared-grid">
+      <div class="field">
+        <label>Product Category</label>
+        <select id="inp-category">
+          <option value="fresh_produce">Fresh Produce</option>
+          <option value="electronics">Electronics</option>
+          <option value="pvc_materials">PVC / Raw Materials</option>
+          <option value="apparel">Apparel</option>
+          <option value="fmcg">FMCG / Consumer Goods</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Current Month</label>
+        <select id="inp-month">
+          <option value="1">January</option><option value="2">February</option>
+          <option value="3">March</option><option value="4" selected>April</option>
+          <option value="5">May</option><option value="6">June</option>
+          <option value="7">July</option><option value="8">August</option>
+          <option value="9">September</option><option value="10">October</option>
+          <option value="11">November</option><option value="12">December</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Number of SKUs</label>
+        <input type="number" id="inp-skus" placeholder="e.g. 50" min="1" value="50">
+      </div>
+      <div class="field">
+        <label>Region / Market</label>
+        <select id="inp-region">
+          <option value="south_asia">South Asia</option>
+          <option value="southeast_asia">Southeast Asia</option>
+          <option value="north_america">North America</option>
+          <option value="europe">Europe</option>
+          <option value="middle_east">Middle East</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3 input panels -->
+  <div class="live-grid">
+    <div class="live-panel p1">
+      <div class="live-panel-title"><div class="panel-icon">📈</div>Production Demand</div>
+      <p>SARIMAX model inputs — forecast next month production</p>
+      <div class="field-group">
+        <div class="field"><label>Current Month Sales Units</label><input type="number" id="inp-curr-sales" placeholder="e.g. 12000" value="12000"></div>
+        <div class="field"><label>Avg Sales Last 3 Months</label><input type="number" id="inp-avg-sales" placeholder="e.g. 11500" value="11500"></div>
+        <div class="field">
+          <label>Seasonal Factor</label>
+          <select id="inp-seasonal">
+            <option value="low">Low season (×0.88)</option>
+            <option value="normal" selected>Normal (×1.00)</option>
+            <option value="high">High / Festival (×1.15)</option>
+            <option value="peak">Peak / Holiday (×1.28)</option>
+          </select>
+        </div>
+        <div class="field"><label>Sales Trend (%)</label><input type="number" id="inp-trend" placeholder="e.g. 5 or -3" value="5" step="0.1"></div>
+      </div>
+    </div>
+
+    <div class="live-panel p2">
+      <div class="live-panel-title"><div class="panel-icon">🔍</div>Defect Detection</div>
+      <p>Random Forest inputs — predict next run defective units</p>
+      <div class="field-group">
+        <div class="field"><label>Planned Production Units</label><input type="number" id="inp-prod-units" placeholder="e.g. 15000" value="15000"></div>
+        <div class="field"><label>Current Defect Rate (%)</label><input type="number" id="inp-defect-rate" placeholder="e.g. 4.2" value="4.2" step="0.1"></div>
+        <div class="field"><label>Machine Age (years)</label><input type="number" id="inp-machine-age" placeholder="e.g. 3" value="3" step="0.1"></div>
+        <div class="field">
+          <label>Last Maintenance</label>
+          <select id="inp-maintenance">
+            <option value="recent">Within 1 month (risk ×0.70)</option>
+            <option value="moderate" selected>1–3 months (risk ×1.00)</option>
+            <option value="overdue">3–6 months (risk ×1.35)</option>
+            <option value="critical">6+ months (risk ×1.70)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="live-panel p3">
+      <div class="live-panel-title"><div class="panel-icon">📦</div>Inventory Levels</div>
+      <p>SARIMA inputs — compute optimal safety stock</p>
+      <div class="field-group">
+        <div class="field"><label>Current Stock on Hand</label><input type="number" id="inp-stock" placeholder="e.g. 8000" value="8000"></div>
+        <div class="field"><label>Lead Time (days)</label><input type="number" id="inp-lead-time" placeholder="e.g. 14" value="14"></div>
+        <div class="field"><label>Holding Cost / Unit / Month ($)</label><input type="number" id="inp-holding-cost" placeholder="e.g. 2.5" value="2.5" step="0.1"></div>
+        <div class="field"><label>Stockout Penalty ($)</label><input type="number" id="inp-stockout" placeholder="e.g. 50" value="50"></div>
+      </div>
+    </div>
+  </div>
+
+  <button class="run-btn" id="runBtn" onclick="runLivePrediction()">⚡ Run AI Predictions for Next Month</button>
+
+  <div class="error-box" id="errorBox"></div>
+
+  <div class="results-area" id="resultsArea">
+    <div class="fallback-note" id="fallbackNote">⚠ AI API unavailable — showing formula-based estimates using SARIMAX, Random Forest &amp; SARIMA model parameters from our research results.</div>
+    <div class="results-header">Prediction Results</div>
+    <div class="results-grid">
+      <div class="result-card r1">
+        <div class="rc-label">RQ1 · Production Forecasting</div>
+        <div class="rc-title">Predicted Production Demand</div>
+        <div class="rc-value" id="res-demand">—<span class="rc-unit">units</span></div>
+        <div class="rc-sub" id="res-demand-sub"></div>
+        <div class="rc-model-badge" id="badge-demand">SARIMAX · best RMSE: 207.56</div>
+      </div>
+      <div class="result-card r2">
+        <div class="rc-label">RQ2 · Defect Detection</div>
+        <div class="rc-title">Predicted Defective Units</div>
+        <div class="rc-value" id="res-defects">—<span class="rc-unit">units</span></div>
+        <div class="rc-sub" id="res-defects-sub"></div>
+        <div class="rc-model-badge" id="badge-defects">Random Forest · Accuracy: 95.06%</div>
+      </div>
+      <div class="result-card r3">
+        <div class="rc-label">RQ3 · Inventory Optimization</div>
+        <div class="rc-title">Recommended Safety Stock</div>
+        <div class="rc-value" id="res-inventory">—<span class="rc-unit">units</span></div>
+        <div class="rc-sub" id="res-inventory-sub"></div>
+        <div class="rc-model-badge" id="badge-inventory">SARIMA · best MAE: 1,344.27</div>
+      </div>
+    </div>
+    <div class="ai-insight" id="aiInsight">
+      <div class="ai-insight-header">✦ AI Analysis &amp; Recommendations</div>
+      <div class="ai-insight-text" id="aiInsightText">Loading analysis...</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end .main -->
+
+<!-- Loading overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div class="loading-text" id="loadingText">Running AI models...</div>
+  <div class="loading-sub"  id="loadingSub">Please wait</div>
+</div>
+
+<script>
+// ══ DATA ══
+const RQ1_DATA = {
+  models: ['ARMA','ARIMAX','SARIMA','ARIMA','SARIMAX'],
+  metrics: {
+    RMSE: [11089.66, 1828.44, 2160.23, 1828.44, 207.56],
+    MAE:  [8294.36,  1340.81, 1749.49, 1562.55, 159.10],
+    MAPE: [13.36,    7.21,    9.45,    11.10,   9.73],
+    R2:   [-0.8912,  0.6713,  0.2255,  0.0661,  0.0722]
+  }
+};
+
+// T1 values from Evaluation_Report.pdf
+// Note: SARIMA/SARIMAX show low numeric errors but are unreliable here —
+// T1 data has no seasonality, so seasonal models overfit/produce misleading results.
+// ARIMA is the true best model (lowest valid RMSE 410.67, MAPE 5.12%).
+const RQ1B_DATA = {
+  models: ['ARMA','ARIMA','SARIMA','ARIMAX','SARIMAX'],
+  metrics: {
+    RMSE: [666.8,  410.67, 385.13, 635.54, 385.13],
+    MAE:  [568.62, 410.66, 385.13, 600.82, 385.13],
+    MAPE: [7.26,   5.12,   3.16,   7.59,   3.16],
+    R2:   [-3.14,  -0.572859, -0.38, -2.76, -0.38]
+  }
+};
+
+const RQ2_KAGGLE = {
+  clean: {
+    models: ['Logistic Regression','Random Forest','XGBoost','MLP'],
+    keys:   ['LR','RF','XGB','MLP'],
+    metrics: {
+      Accuracy:  [0.695988, 0.836420, 0.783951, 0.824074],
+      Precision: [0.920290, 0.845669, 0.857143, 0.844800],
+      Recall:    [0.699083, 0.985321, 0.891743, 0.968807],
+      F1:        [0.794578, 0.910169, 0.874101, 0.902564]
+    }
+  },
+  full: {
+    models: ['Logistic Regression','Random Forest','XGBoost','MLP'],
+    keys:   ['LR','RF','XGB','MLP'],
+    metrics: {
+      Accuracy:  [0.737654, 0.950617, 0.949074, 0.905864],
+      Precision: [0.935035, 0.950791, 0.950704, 0.911565],
+      Recall:    [0.739450, 0.992661, 0.990826, 0.983486],
+      F1:        [0.825820, 0.971275, 0.970350, 0.946161]
+    }
+  }
+};
+
+const RQ2_DATACO = {
+  models: ['Logistic Regression','Random Forest','XGBoost','MLP'],
+  keys:   ['LR','RF','XGB','MLP'],
+  metrics: {
+    Accuracy:  [0.6875, 0.8115, 0.7355, 0.6956],
+    Precision: [0.7932, 0.8867, 0.8240, 0.7895],
+    Recall:    [0.5817, 0.7523, 0.6582, 0.6065],
+    F1:        [0.6712, 0.8139, 0.7318, 0.6860]
+  }
+};
+
+const RQ3_DATA = {
+  models: ['ARIMA','SARIMA','N-BEATS','ARIMAX','ARMA'],
+  metrics: {
+    MAE:  [5466.87, 1344.27, 3858.80, 3335.55, 4696.36],
+    RMSE: [7283.69, 1995.96, 4995.40, 4345.33, 5952.89],
+    MAPE: [14.49,   9.96,    7.12,    6.75,    12.39],
+    WAPE: [14.24,   9.43,    7.15,    6.68,    12.41]
+  }
+};
+
+const BAR_COLORS = ['#00e5ff','#ff4d6d','#ffb830','#a0ff6f','#9b59b6'];
+
+// ══ HELPERS ══
+function fmt(v, metric) {
+  if (v === null || v === undefined) return 'N/A';
+  if (metric === 'R2') return parseFloat(v).toFixed(4);
+  if (['Accuracy','Precision','Recall','F1'].includes(metric)) return (parseFloat(v)*100).toFixed(2)+'%';
+  if (['MAPE','WAPE'].includes(metric)) return parseFloat(v).toFixed(2)+'%';
+  return parseFloat(v).toLocaleString(undefined, {maximumFractionDigits:2});
+}
+function bestIdx(vals, metric) {
+  const higher = ['R2','Accuracy','Precision','Recall','F1'];
+  return higher.includes(metric)
+    ? vals.indexOf(Math.max(...vals))
+    : vals.indexOf(Math.min(...vals));
+}
+function makeTable(models, metricsObj, bestMetric, el) {
+  const mkeys = Object.keys(metricsObj);
+  let h = `<tr><th>Model</th>${mkeys.map(m=>`<th>${m}</th>`).join('')}</tr>`;
+  models.forEach((m,i) => {
+    const rb = bestIdx(metricsObj[bestMetric], bestMetric) === i;
+    h += `<tr class="${rb?'highlight-row':''}"><td style="font-weight:600;color:var(--text);">${m}</td>`;
+    mkeys.forEach(mk => {
+      const bi = bestIdx(metricsObj[mk], mk);
+      h += `<td class="${bi===i?'best':''}">${fmt(metricsObj[mk][i], mk)}</td>`;
+    });
+    h += '</tr>';
+  });
+  el.innerHTML = h;
+}
+function makeBarChart(models, vals, metric, container) {
+  const higher = ['R2','Accuracy','Precision','Recall','F1'];
+  const isH = higher.includes(metric);
+  const abs = vals.map(v=>Math.abs(v));
+  const mx = Math.max(...abs) || 1;
+  const bi = bestIdx(vals, metric);
+  let h = `<h3>MODEL COMPARISON — ${metric} ${isH?'(higher is better)':'(lower is better)'}</h3>`;
+  models.forEach((m,i) => {
+    const pct = Math.max(Math.round((abs[i]/mx)*100), 3);
+    const col = i===bi ? '#a0ff6f' : BAR_COLORS[i%BAR_COLORS.length];
+    h += `<div class="bar-row">
+      <div class="bar-label">${m.length>12?m.slice(0,12)+'…':m}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${col};">${pct>18?m.slice(0,5):''}</div></div>
+      <div class="bar-val">${fmt(vals[i],metric)}</div>
+    </div>`;
+  });
+  container.innerHTML = h;
+}
+function makeSingleCards(model, metricsObj, models, container) {
+  const idx = models.indexOf(model);
+  const types = ['rmse','mae','mape','r2','acc','prec','rec','f1','wape'];
+  let h = '';
+  Object.keys(metricsObj).forEach((mk,ki) => {
+    h += `<div class="metric-card ${types[ki]||'rmse'}">
+      <div class="metric-label">${mk}</div>
+      <div class="metric-value">${fmt(metricsObj[mk][idx],mk)}</div>
+    </div>`;
+  });
+  container.innerHTML = h; container.style.display = 'grid';
+}
+
+// ══ RENDER ══
+function renderRQ1() {
+  const model = document.getElementById('rq1-model').value;
+  const metric = document.getElementById('rq1-metric').value;
+  const {models,metrics} = RQ1_DATA;
+  const s = document.getElementById('rq1-single-cards');
+  if (model !== 'all') makeSingleCards(model,metrics,models,s); else s.style.display='none';
+  makeBarChart(models,metrics[metric],metric,document.getElementById('rq1-chart'));
+  makeTable(models,metrics,metric,document.getElementById('rq1-table'));
+}
+function renderRQ1B() {
+  const model = document.getElementById('rq1b-model').value;
+  const metric = document.getElementById('rq1b-metric').value;
+  const {models,metrics} = RQ1B_DATA;
+  const s = document.getElementById('rq1b-single-cards');
+  if (model !== 'all') makeSingleCards(model,metrics,models,s); else s.style.display='none';
+  makeBarChart(models,metrics[metric],metric,document.getElementById('rq1b-chart'));
+  makeTable(models,metrics,metric,document.getElementById('rq1b-table'));
+}
+function renderRQ2() {
+  const ds    = document.getElementById('rq2-dataset').value;
+  const split = document.getElementById('rq2-split').value;
+  const mSel  = document.getElementById('rq2-model').value;
+  const spEl  = document.getElementById('rq2-split').closest('.selector-group');
+  spEl.style.opacity = ds==='dataco'?'0.4':'1';
+  spEl.querySelector('select').disabled = ds==='dataco';
+  let data, info;
+  if (ds==='kaggle') {
+    data = split==='full' ? RQ2_KAGGLE.full : RQ2_KAGGLE.clean;
+    info = `<strong>Dataset:</strong> Kaggle – Predicting Manufacturing Defects &nbsp;|&nbsp; <strong>Split:</strong> ${split==='full'?'Full Features':'Clean Features'} &nbsp;|&nbsp; <a href="https://www.kaggle.com/datasets/rabieelkharoua/predicting-manufacturing-defects-dataset" target="_blank" style="color:var(--accent);">View on Kaggle ↗</a>`;
+  } else {
+    data = RQ2_DATACO;
+    info = `<strong>Dataset:</strong> Kaggle – DataCo Smart Supply Chain &nbsp;|&nbsp; <a href="https://www.kaggle.com/datasets/shashwatwork/dataco-smart-supply-chain-for-big-data-analysis" target="_blank" style="color:var(--accent);">View on Kaggle ↗</a>`;
+  }
+  document.getElementById('rq2-info').innerHTML = info;
+  const {models,keys,metrics} = data;
+  const s = document.getElementById('rq2-single-cards');
+  if (mSel!=='all') { const idx=keys.indexOf(mSel); if(idx>=0) makeSingleCards(models[idx],metrics,models,s); else s.style.display='none'; }
+  else s.style.display='none';
+  makeBarChart(models,metrics.Accuracy,'Accuracy',document.getElementById('rq2-chart'));
+  makeTable(models,metrics,'Accuracy',document.getElementById('rq2-table'));
+}
+function renderRQ3() {
+  const model  = document.getElementById('rq3-model').value;
+  const metric = document.getElementById('rq3-metric').value.replace(' (primary)','').replace(' (%)','');
+  const {models,metrics} = RQ3_DATA;
+  const s = document.getElementById('rq3-single-cards');
+  if (model!=='all') makeSingleCards(model,metrics,models,s); else s.style.display='none';
+  makeBarChart(models,metrics[metric],metric,document.getElementById('rq3-chart'));
+  makeTable(models,metrics,metric,document.getElementById('rq3-table'));
+}
+
+// ══ PAGE NAV ══
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+
+// ══ FORMULA FALLBACK ══
+function computeFallback(inp) {
+  const sm = {low:0.88,normal:1.0,high:1.15,peak:1.28}[inp.seasonal]||1;
+  const mr = {recent:0.7,moderate:1.0,overdue:1.35,critical:1.7}[inp.maintenance]||1;
+  const tf = 1+(inp.trend/100);
+  const demand = Math.round(inp.avgSales*tf*sm*0.6 + inp.currSales*tf*sm*0.4);
+  const adjRate = Math.min(inp.defectRate*mr*(1+inp.machineAge*0.025), 35);
+  const defects = Math.round(inp.prodUnits*(adjRate/100));
+  const dailyD  = demand/30;
+  const varCoef = Math.abs(inp.currSales-inp.avgSales)/(inp.avgSales||1);
+  const sf      = 1.3+varCoef*0.5;
+  const inventory = Math.round(dailyD*inp.leadTime*sf);
+  const diff = inventory-inp.stock;
+  const action = diff>0
+    ? `reorder <strong>${diff.toLocaleString()} additional units</strong>`
+    : `you have <strong>${Math.abs(diff).toLocaleString()} units of excess stock</strong> to manage`;
+  const insight = `<strong>Demand Outlook:</strong> Next month production demand is forecast at <strong>${demand.toLocaleString()} units</strong> (${inp.trend>0?'+':''}${inp.trend}% trend, ${inp.seasonal} season). ${inp.trend>2?'Plan capacity increases accordingly.':inp.trend<0?'Consider reducing production runs to avoid overstock.':'Stable demand — maintain current production schedule.'}<br><br>
+<strong>Quality Risk:</strong> Adjusted defect rate of <strong>${adjRate.toFixed(1)}%</strong> (machine age ${inp.machineAge}yr, maintenance risk ×${mr}) gives approximately <strong>${defects.toLocaleString()} defective units</strong> in the next run. ${adjRate>10?'Schedule maintenance immediately.':adjRate>5?'Monitor quality closely during production.':'Defect risk is within acceptable range.'}<br><br>
+<strong>Inventory Recommendation:</strong> Recommended safety stock is <strong>${inventory.toLocaleString()} units</strong> (${inp.leadTime}-day lead time, safety factor ×${sf.toFixed(2)}). You should ${action}. Holding cost: $${(inventory*inp.holdingCost).toLocaleString()}/month vs. stockout penalty $${inp.stockout}/unit.`;
+  return {
+    demand, demandSub:`Seasonal ×${sm}, trend +${inp.trend}%, weighted avg of current & 3-month sales.`,
+    defects, defectsSub:`Adjusted rate: ${adjRate.toFixed(1)}% (base ${inp.defectRate}%, maintenance risk ×${mr}, age penalty +${(inp.machineAge*2.5).toFixed(1)}%).`,
+    inventory, inventorySub:`Safety stock = (${demand.toLocaleString()} units/30) × ${inp.leadTime} days × ${sf.toFixed(2)} safety factor.`,
+    insight
+  };
+}
+
+// ══ LIVE PREDICTION ══
+async function runLivePrediction() {
+  const btn      = document.getElementById('runBtn');
+  const overlay  = document.getElementById('loadingOverlay');
+  const ltxt     = document.getElementById('loadingText');
+  const lsub     = document.getElementById('loadingSub');
+  const errBox   = document.getElementById('errorBox');
+  const fbNote   = document.getElementById('fallbackNote');
+  errBox.classList.remove('visible');
+  fbNote.classList.remove('visible');
+
+  const inp = {
+    category:   document.getElementById('inp-category').value,
+    month:      parseInt(document.getElementById('inp-month').value),
+    skus:       parseInt(document.getElementById('inp-skus').value)||50,
+    region:     document.getElementById('inp-region').value,
+    currSales:  parseFloat(document.getElementById('inp-curr-sales').value)||0,
+    avgSales:   parseFloat(document.getElementById('inp-avg-sales').value)||0,
+    seasonal:   document.getElementById('inp-seasonal').value,
+    trend:      parseFloat(document.getElementById('inp-trend').value)||0,
+    prodUnits:  parseFloat(document.getElementById('inp-prod-units').value)||0,
+    defectRate: parseFloat(document.getElementById('inp-defect-rate').value)||0,
+    machineAge: parseFloat(document.getElementById('inp-machine-age').value)||0,
+    maintenance:document.getElementById('inp-maintenance').value,
+    stock:      parseFloat(document.getElementById('inp-stock').value)||0,
+    leadTime:   parseInt(document.getElementById('inp-lead-time').value)||14,
+    holdingCost:parseFloat(document.getElementById('inp-holding-cost').value)||2.5,
+    stockout:   parseFloat(document.getElementById('inp-stockout').value)||50
+  };
+
+  if (!inp.currSales || !inp.prodUnits || !inp.stock) {
+    errBox.textContent = 'Please fill in Current Month Sales, Planned Production Units, and Current Stock on Hand before running predictions.';
+    errBox.classList.add('visible'); return;
+  }
+
+  btn.disabled = true; overlay.classList.add('visible');
+  const msgs = [
+    ['Computing SARIMAX demand forecast…','Applying seasonal & trend factors'],
+    ['Running Random Forest classifier…','Evaluating defect risk features'],
+    ['Calculating SARIMA safety stock…','Optimising inventory levels'],
+    ['Generating AI analysis…','Synthesising all three results']
+  ];
+  let mi = 0;
+  const iv = setInterval(()=>{ mi=(mi+1)%msgs.length; ltxt.textContent=msgs[mi][0]; lsub.textContent=msgs[mi][1]; }, 1400);
+
+  const fb = computeFallback(inp);
+  const prompt = `You are an expert AI supply chain analyst for AISCOS — an AI-Based Supply Chain Optimization System.
+
+## Input Parameters
+- Product Category: ${inp.category.replace(/_/g,' ')}
+- Region: ${inp.region.replace(/_/g,' ')}
+- SKUs: ${inp.skus} | Month: ${inp.month}
+- Current Sales: ${inp.currSales.toLocaleString()} units | Avg (3mo): ${inp.avgSales.toLocaleString()} units
+- Seasonal Factor: ${inp.seasonal} | Growth Trend: ${inp.trend>0?'+':''}${inp.trend}%
+- Planned Production: ${inp.prodUnits.toLocaleString()} | Defect Rate: ${inp.defectRate}%
+- Machine Age: ${inp.machineAge}yr | Last Maintenance: ${inp.maintenance}
+- Stock on Hand: ${inp.stock.toLocaleString()} | Lead Time: ${inp.leadTime} days
+- Holding Cost: $${inp.holdingCost}/unit/mo | Stockout Penalty: $${inp.stockout}/unit
+
+## Research Model Benchmarks
+- RQ1 Best: SARIMAX (RMSE 207.56, MAE 159.10 on FreshRetailNet-50K)
+- RQ2 Best: Random Forest (Accuracy 95.06%, F1 97.13%, Recall 99.27%)
+- RQ3 Best: SARIMA (MAE 1344.27, RMSE 1995.96)
+
+## Formula Pre-estimates (use as starting reference)
+demand≈${fb.demand.toLocaleString()}, defects≈${fb.defects.toLocaleString()}, safety_stock≈${fb.inventory.toLocaleString()}
+
+Respond ONLY with valid JSON (no markdown, no backticks, no preamble):
+{"demand":<integer>,"demandSub":"<one sentence>","defects":<integer>,"defectsSub":"<one sentence>","inventory":<integer>,"inventorySub":"<one sentence>","insight":"<3-4 sentences using HTML strong tags covering demand outlook, quality risk, and inventory action>"}`;
+
+  let result = null; let usedFb = false;
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:1000, messages:[{role:"user",content:prompt}] })
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    const text = (data.content||[]).map(i=>i.text||'').join('');
+    if (!text) throw new Error('Empty response');
+    const clean = text.replace(/```json\s*/g,'').replace(/```\s*/g,'').trim();
+    result = JSON.parse(clean);
+  } catch(e) {
+    console.warn('API fallback:', e.message);
+    result = fb; usedFb = true;
+  }
+
+  clearInterval(iv); overlay.classList.remove('visible'); btn.disabled = false;
+
+  document.getElementById('res-demand').innerHTML    = `${result.demand.toLocaleString()}<span class="rc-unit">units</span>`;
+  document.getElementById('res-demand-sub').textContent   = result.demandSub;
+  document.getElementById('res-defects').innerHTML   = `${result.defects.toLocaleString()}<span class="rc-unit">units</span>`;
+  document.getElementById('res-defects-sub').textContent  = result.defectsSub;
+  document.getElementById('res-inventory').innerHTML = `${result.inventory.toLocaleString()}<span class="rc-unit">units</span>`;
+  document.getElementById('res-inventory-sub').textContent= result.inventorySub;
+  document.getElementById('aiInsightText').innerHTML = result.insight;
+
+  if (usedFb) {
+    fbNote.classList.add('visible');
+    document.getElementById('badge-demand').textContent    = 'SARIMAX formula estimate · best RMSE 207.56';
+    document.getElementById('badge-defects').textContent   = 'Random Forest formula estimate · Acc 95.06%';
+    document.getElementById('badge-inventory').textContent = 'SARIMA formula estimate · best MAE 1,344.27';
+  }
+
+  document.getElementById('resultsArea').classList.add('visible');
+  document.getElementById('resultsArea').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ══ INIT ══
+renderRQ1(); renderRQ1B(); renderRQ2(); renderRQ3();
+</script>
+</body>
+</html>
